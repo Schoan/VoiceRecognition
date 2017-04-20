@@ -212,6 +212,7 @@
             this.Controls.Add(this.buttonFullList);
             this.Name = "Form";
             this.Text = "Form";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_FormClosing);
             this.Load += new System.EventHandler(this.Form_Load);
             this.groupBox.ResumeLayout(false);
             this.groupBox.PerformLayout();
