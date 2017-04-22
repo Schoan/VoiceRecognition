@@ -45,7 +45,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.listViewResults = new System.Windows.Forms.ListView();
+            this.videofsWatcher = new System.IO.FileSystemWatcher();
             this.groupBox.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonFullList
@@ -201,6 +203,11 @@
             this.listViewResults.UseCompatibleStateImageBehavior = false;
             this.listViewResults.View = System.Windows.Forms.View.List;
             // 
+            // videofsWatcher
+            // 
+            this.videofsWatcher.EnableRaisingEvents = true;
+            this.videofsWatcher.SynchronizingObject = this;
+            // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -216,6 +223,7 @@
             this.Load += new System.EventHandler(this.Form_Load);
             this.groupBox.ResumeLayout(false);
             this.groupBox.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -237,6 +245,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.ListView listViewResults;
+        private System.IO.FileSystemWatcher videofsWatcher;
     }
 }
 

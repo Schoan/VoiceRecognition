@@ -8,21 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Diagnostics;
 
 namespace VoiceRecognition
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        //SqlConnection sqlConnection = new SqlConnection("Data Source=(local);Initial Catalog=MySQL57;Integrated Security=SSPI");
-        //SqlConnection sqlConnection = new SqlConnection("Data Source=(local);USER ID=root;Password=rlgus5125");
         MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
         MySqlCommand cmd = new MySqlCommand();
         MySqlDataReader reader;
 
+        static String videoDirectory = Directory.GetCurrentDirectory() + "\\video";
+        static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio";
+        static String processedDirectory = Directory.GetCurrentDirectory() + "\\processed";
+
         public Form()
         {
             InitializeComponent();
-
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -92,6 +95,65 @@ namespace VoiceRecognition
                 }
                 reader.Close();
             }
+
+            FolderChecker();
+        }
+
+        private void FolderChecker()
+        {
+            if (!Directory.Exists(videoDirectory))
+                Directory.CreateDirectory(videoDirectory);
+            if (!Directory.Exists(audioDirectory))
+                Directory.CreateDirectory(audioDirectory);
+            if (!Directory.Exists(processedDirectory))
+                Directory.CreateDirectory(processedDirectory);
+
+            DirectoryInfo dInfo = new DirectoryInfo(videoDirectory);
+
+            videofsWatcher.Path = videoDirectory;
+            videofsWatcher.NotifyFilter = NotifyFilters.FileName;
+            videofsWatcher.Filter = "";
+
+            videofsWatcher.Created += new FileSystemEventHandler(videoCreated);
+
+            for(int i=0; i<1000000; i++)
+            {
+
+            }
+        }
+
+        private static void videoCreated(object source, FileSystemEventArgs e)
+        {
+            videoAdded(e.Name);
+        }
+
+        private static void videoAdded(String fileName)
+        {
+            /*
+             * SQL; 번호, 파일명, 점수, 처리 날짜, 상태 (번호는 auto_increment)
+             * 
+             * System init :: 전체 검사
+             * 디렉토리 내부 변경 신호; catch : SQL 등록; 번호, 파일명, (점수), 처리날짜, 상태 (extracting voice)
+             * 구글에 전달 : SQL 반영 (readout in google)
+             * 비교 완료 : SQL 반영; 점수등록 (process complete)
+             * 파일 이동 (video -> processed)
+             * 
+            */
+
+            //Log 반영코드 추가할것
+            //SQL 반영코드 추가할것
+
+            String inputVideo = fileName;
+            String[] videoName = inputVideo.Split('.');
+
+            String arg = "-i \"" + videoDirectory + "\\" + inputVideo + "\" -acodec flac -bits_per_raw_sample 16 -ar 44100 -ac 1 \"" + audioDirectory + "\\" + videoName[0] + ".flac\"";
+
+            ProcessStartInfo psInfo = new ProcessStartInfo("ffmpeg.exe", arg);
+            psInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            psInfo.CreateNoWindow = true;
+            Process.Start(psInfo).WaitForExit();
+
+            // 뒤쪽으로는 Speech API 시행 및 비교
         }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)

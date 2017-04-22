@@ -15,8 +15,6 @@ namespace VoiceRecognition
         [STAThread]
         static void Main()
         {
-            //var speech = SpeechClient.Create();
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form());
