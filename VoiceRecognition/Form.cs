@@ -15,9 +15,9 @@ namespace VoiceRecognition
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
-        MySqlCommand cmd = new MySqlCommand();
-        MySqlDataReader reader;
+        static MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
+        static MySqlCommand cmd = new MySqlCommand();
+        static MySqlDataReader reader;
 
         static String videoDirectory = Directory.GetCurrentDirectory() + "\\video";
         static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio";
@@ -115,11 +115,6 @@ namespace VoiceRecognition
             videofsWatcher.Filter = "";
 
             videofsWatcher.Created += new FileSystemEventHandler(videoCreated);
-
-            for(int i=0; i<1000000; i++)
-            {
-
-            }
         }
 
         private static void videoCreated(object source, FileSystemEventArgs e)
@@ -130,7 +125,6 @@ namespace VoiceRecognition
         private static void videoAdded(String fileName)
         {
             /*
-             * SQL; 번호, 파일명, 점수, 처리 날짜, 상태 (번호는 auto_increment)
              * 
              * System init :: 전체 검사
              * 디렉토리 내부 변경 신호; catch : SQL 등록; 번호, 파일명, (점수), 처리날짜, 상태 (extracting voice)
@@ -152,6 +146,10 @@ namespace VoiceRecognition
             psInfo.WindowStyle = ProcessWindowStyle.Hidden;
             psInfo.CreateNoWindow = true;
             Process.Start(psInfo).WaitForExit();
+
+            //중국어 간체를 Encoding하여 사용.
+            //DB는 UTF8 general.
+            //http://www.hoons.net/Board/QACSHAP/Content/40467
 
             // 뒤쪽으로는 Speech API 시행 및 비교
         }
