@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
+using Google.Cloud.Speech.V1Beta1;
 
 namespace VoiceRecognition
 {
@@ -151,7 +152,29 @@ namespace VoiceRecognition
             //DB는 UTF8 general.
             //http://www.hoons.net/Board/QACSHAP/Content/40467
 
-            // 뒤쪽으로는 Speech API 시행 및 비교
+            var speech = SpeechClient.Create();
+            var response = speech.SyncRecognize(new RecognitionConfig()
+            {
+                Encoding = RecognitionConfig.Types.AudioEncoding.Flac,
+                SampleRate = 44100,
+                LanguageCode = "cmn-Hans-CN"
+            }, RecognitionAudio.FromFile(audioDirectory + videoName[0]+".flac"));
+
+           foreach(var result in response.Results)
+           {
+                foreach (var alternative in result.Alternatives)
+                {
+                    Byte[] unicodeByte = Encoding.Unicode.GetBytes(result.Alternatives.ToString());
+                    String utf8String = Encoding.UTF8.GetString(unicodeByte);
+                    //Console.WriteLine(alternative.Transcript);
+                    cmd = new MySqlCommand("UPDATE ", sqlConnection);
+
+                    cmd.ExecuteNonQuery();
+                }
+           }
+
+
+            // 비교
         }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
