@@ -140,6 +140,14 @@ namespace VoiceRecognition
 
             String inputVideo = fileName;
             String[] videoName = inputVideo.Split('.');
+            String[] param = videoName[0].Split('_');
+
+            cmd = new MySqlCommand("INSERT INTO scores(user, date, script_name) VALUES (@user, @date, @script_name)", sqlConnection);
+            cmd.Parameters.AddWithValue("@user", param[0]);
+            cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd- HH:mm:ss"));
+            cmd.Parameters.AddWithValue("@script_name", param[1]);
+            cmd.ExecuteNonQuery();
+            //SQL 최초등록
 
             String arg = "-i \"" + videoDirectory + "\\" + inputVideo + "\" -acodec flac -bits_per_raw_sample 16 -ar 44100 -ac 1 \"" + audioDirectory + "\\" + videoName[0] + ".flac\"";
 
@@ -164,8 +172,7 @@ namespace VoiceRecognition
            {
                 foreach (var alternative in result.Alternatives)
                 {
-                    Byte[] unicodeByte = Encoding.Unicode.GetBytes(result.Alternatives.ToString());
-                    String utf8String = Encoding.UTF8.GetString(unicodeByte);
+                    
                     //Console.WriteLine(alternative.Transcript);
                     cmd = new MySqlCommand("UPDATE ", sqlConnection);
 
