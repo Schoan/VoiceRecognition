@@ -217,6 +217,8 @@
             this.Controls.Add(this.groupBox);
             this.Controls.Add(this.buttonOption);
             this.Controls.Add(this.buttonFullList);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Form";
             this.Text = "Form";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_FormClosing);

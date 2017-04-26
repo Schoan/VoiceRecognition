@@ -138,16 +138,24 @@ namespace VoiceRecognition
             //Log 반영코드 추가할것
             //SQL 반영코드 추가할것
 
+
+            /*
+             * 들어올 파일의 이름은 '유저이름_스크립트_해시' 형태로 이루어져야 한다.
+             * 파일의 이름은 전송하는 클라이언트 수준에서 변경되어 전송되어야 한다.
+             */
+
             String inputVideo = fileName;
             String[] videoName = inputVideo.Split('.');
             String[] param = videoName[0].Split('_');
+            //LAST_INSERT_ID()로 auto_increment를 알아내는 방법도 있으나 다중시행될 경우를 고려
+            String datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
-            cmd = new MySqlCommand("INSERT INTO scores(user, date, script_name) VALUES (@user, @date, @script_name)", sqlConnection);
+            cmd = new MySqlCommand("INSERT INTO scores(user, date, script_name, state) VALUES (@user, @date, @script_name, @state)", sqlConnection);
             cmd.Parameters.AddWithValue("@user", param[0]);
-            cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd- HH:mm:ss"));
+            cmd.Parameters.AddWithValue("@date", datetime);
             cmd.Parameters.AddWithValue("@script_name", param[1]);
+            cmd.Parameters.AddWithValue("@state", "Processing");
             cmd.ExecuteNonQuery();
-            //SQL 최초등록
 
             String arg = "-i \"" + videoDirectory + "\\" + inputVideo + "\" -acodec flac -bits_per_raw_sample 16 -ar 44100 -ac 1 \"" + audioDirectory + "\\" + videoName[0] + ".flac\"";
 
@@ -155,10 +163,6 @@ namespace VoiceRecognition
             psInfo.WindowStyle = ProcessWindowStyle.Hidden;
             psInfo.CreateNoWindow = true;
             Process.Start(psInfo).WaitForExit();
-
-            //중국어 간체를 Encoding하여 사용.
-            //DB는 UTF8 general.
-            //http://www.hoons.net/Board/QACSHAP/Content/40467
 
             var speech = SpeechClient.Create();
             var response = speech.SyncRecognize(new RecognitionConfig()
@@ -168,24 +172,28 @@ namespace VoiceRecognition
                 LanguageCode = "cmn-Hans-CN"
             }, RecognitionAudio.FromFile(audioDirectory + videoName[0]+".flac"));
 
-           foreach(var result in response.Results)
-           {
+            String script= "";
+            foreach(var result in response.Results)
+            {
                 foreach (var alternative in result.Alternatives)
                 {
-                    
-                    //Console.WriteLine(alternative.Transcript);
-                    cmd = new MySqlCommand("UPDATE ", sqlConnection);
-
-                    cmd.ExecuteNonQuery();
+                    script += alternative.Transcript.ToString()+",";
                 }
-           }
+            }
+            script = script.Substring(0, script.LastIndexOf(","));
 
+            cmd = new MySqlCommand("UPDATE scores SET state=@state, script=@script WHERE date = @datetime", sqlConnection);
+            cmd.Parameters.AddWithValue("@state", "");
+            cmd.Parameters.AddWithValue("@script", script);
+            cmd.Parameters.AddWithValue("@datetime", datetime);
+            cmd.ExecuteNonQuery();
 
             // 비교
         }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
+            
             if(MessageBox.Show("프로그램을 정말 종료합니까?", "프로그램 종료", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 sqlConnection.Close();
@@ -195,6 +203,7 @@ namespace VoiceRecognition
                 e.Cancel = true;
                 return;
             }
+            //종료 버튼을 따로 만들고, 여기는 트레이로 보내고 벌룬팁 띄우게 수정
         }
     }
 }
