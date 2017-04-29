@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using MySql.Data.MySqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 using Google.Cloud.Speech.V1Beta1;
 
 namespace VoiceRecognition
@@ -142,19 +142,25 @@ namespace VoiceRecognition
             /*
              * 들어올 파일의 이름은 '유저이름_스크립트_해시' 형태로 이루어져야 한다.
              * 파일의 이름은 전송하는 클라이언트 수준에서 변경되어 전송되어야 한다.
+             * 즉, 해싱 또한 클라이언트에서 수행하여 서버로 전달하며 별도의 검사를 수행하지 않는다.
+             * 해시는 파일 무결성을 보장함과 동시에 중복되지 않도록 하는 역할을 수행하도록 한다.
+             * SHA256에 의하여 해싱한다. 해시 충돌은 없다고 가정한다.
              */
 
             String inputVideo = fileName;
             String[] videoName = inputVideo.Split('.');
             String[] param = videoName[0].Split('_');
+            String hash = param[2];
             //LAST_INSERT_ID()로 auto_increment를 알아내는 방법도 있으나 다중시행될 경우를 고려
-            String datetime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
 
-            cmd = new MySqlCommand("INSERT INTO scores(user, date, script_name, state) VALUES (@user, @date, @script_name, @state)", sqlConnection);
+            //해시기반으로 수정. 해시 중복 체크 후 INSERT
+
+            cmd = new MySqlCommand("INSERT INTO scores(user, date, script_name, state, hash) VALUES (@user, @date, @script_name, @state, @hash)", sqlConnection);
             cmd.Parameters.AddWithValue("@user", param[0]);
-            cmd.Parameters.AddWithValue("@date", datetime);
+            cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); //.fff
             cmd.Parameters.AddWithValue("@script_name", param[1]);
             cmd.Parameters.AddWithValue("@state", "Processing");
+            cmd.Parameters.AddWithValue("@hash", param[2]);
             cmd.ExecuteNonQuery();
 
             String arg = "-i \"" + videoDirectory + "\\" + inputVideo + "\" -acodec flac -bits_per_raw_sample 16 -ar 44100 -ac 1 \"" + audioDirectory + "\\" + videoName[0] + ".flac\"";
@@ -182,10 +188,10 @@ namespace VoiceRecognition
             }
             script = script.Substring(0, script.LastIndexOf(","));
 
-            cmd = new MySqlCommand("UPDATE scores SET state=@state, script=@script WHERE date = @datetime", sqlConnection);
+            cmd = new MySqlCommand("UPDATE scores SET state=@state, script=@script WHERE hash = @hash", sqlConnection);
             cmd.Parameters.AddWithValue("@state", "");
             cmd.Parameters.AddWithValue("@script", script);
-            cmd.Parameters.AddWithValue("@datetime", datetime);
+            cmd.Parameters.AddWithValue("@hash", hash);
             cmd.ExecuteNonQuery();
 
             // 비교
@@ -193,17 +199,25 @@ namespace VoiceRecognition
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
-            if(MessageBox.Show("프로그램을 정말 종료합니까?", "프로그램 종료", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            e.Cancel = true;
+            this.Visible = false;
+            notifyIcon.ShowBalloonTip(3, "승승", "트레이로 이동합니다...", ToolTipIcon.Info);
+        }
+
+        private void buttonExit_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("프로그램을 정말 종료합니까?", "프로그램 종료", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 sqlConnection.Close();
+                notifyIcon.Visible = false;
+                Application.ExitThread();
             }
-            else
-            {
-                e.Cancel = true;
-                return;
-            }
-            //종료 버튼을 따로 만들고, 여기는 트레이로 보내고 벌룬팁 띄우게 수정
+        }
+
+        private void notifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
         }
     }
 }

@@ -46,6 +46,8 @@
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.listViewResults = new System.Windows.Forms.ListView();
             this.videofsWatcher = new System.IO.FileSystemWatcher();
+            this.buttonExit = new System.Windows.Forms.Button();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
@@ -67,6 +69,7 @@
             this.imageList.Images.SetKeyName(0, "icon_list.png");
             this.imageList.Images.SetKeyName(1, "icon_option.png");
             this.imageList.Images.SetKeyName(2, "icon_search.png");
+            this.imageList.Images.SetKeyName(3, "icon_exit.png");
             // 
             // buttonOption
             // 
@@ -208,19 +211,39 @@
             this.videofsWatcher.EnableRaisingEvents = true;
             this.videofsWatcher.SynchronizingObject = this;
             // 
+            // buttonExit
+            // 
+            this.buttonExit.ImageIndex = 3;
+            this.buttonExit.ImageList = this.imageList;
+            this.buttonExit.Location = new System.Drawing.Point(134, 12);
+            this.buttonExit.Name = "buttonExit";
+            this.buttonExit.Size = new System.Drawing.Size(55, 55);
+            this.buttonExit.TabIndex = 5;
+            this.buttonExit.UseVisualStyleBackColor = true;
+            this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
+            // 
+            // notifyIcon
+            // 
+            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+            this.notifyIcon.Text = "승승";
+            this.notifyIcon.Visible = true;
+            this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
+            // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1036, 642);
+            this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.listViewResults);
             this.Controls.Add(this.groupBox);
             this.Controls.Add(this.buttonOption);
             this.Controls.Add(this.buttonFullList);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form";
-            this.Text = "Form";
+            this.Text = "승승";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_FormClosing);
             this.Load += new System.EventHandler(this.Form_Load);
             this.groupBox.ResumeLayout(false);
@@ -248,6 +271,8 @@
         private System.Windows.Forms.Button buttonSearch;
         private System.Windows.Forms.ListView listViewResults;
         private System.IO.FileSystemWatcher videofsWatcher;
+        private System.Windows.Forms.Button buttonExit;
+        private System.Windows.Forms.NotifyIcon notifyIcon;
     }
 }
 
