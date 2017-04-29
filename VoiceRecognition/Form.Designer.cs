@@ -48,6 +48,7 @@
             this.videofsWatcher = new System.IO.FileSystemWatcher();
             this.buttonExit = new System.Windows.Forms.Button();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.textBoxLog = new System.Windows.Forms.TextBox();
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
@@ -201,7 +202,7 @@
             this.listViewResults.Location = new System.Drawing.Point(12, 177);
             this.listViewResults.MultiSelect = false;
             this.listViewResults.Name = "listViewResults";
-            this.listViewResults.Size = new System.Drawing.Size(1012, 453);
+            this.listViewResults.Size = new System.Drawing.Size(1012, 302);
             this.listViewResults.TabIndex = 4;
             this.listViewResults.UseCompatibleStateImageBehavior = false;
             this.listViewResults.View = System.Windows.Forms.View.List;
@@ -229,11 +230,23 @@
             this.notifyIcon.Visible = true;
             this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
             // 
+            // textBoxLog
+            // 
+            this.textBoxLog.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.textBoxLog.Location = new System.Drawing.Point(12, 498);
+            this.textBoxLog.Multiline = true;
+            this.textBoxLog.Name = "textBoxLog";
+            this.textBoxLog.ReadOnly = true;
+            this.textBoxLog.Size = new System.Drawing.Size(1012, 124);
+            this.textBoxLog.TabIndex = 6;
+            // 
             // Form
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1036, 642);
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.ClientSize = new System.Drawing.Size(1036, 634);
+            this.Controls.Add(this.textBoxLog);
             this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.listViewResults);
             this.Controls.Add(this.groupBox);
@@ -250,6 +263,7 @@
             this.groupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -273,6 +287,7 @@
         private System.IO.FileSystemWatcher videofsWatcher;
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.NotifyIcon notifyIcon;
+        private System.Windows.Forms.TextBox textBoxLog;
     }
 }
 
