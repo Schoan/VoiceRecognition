@@ -237,7 +237,7 @@
             this.textBoxLog.Multiline = true;
             this.textBoxLog.Name = "textBoxLog";
             this.textBoxLog.ReadOnly = true;
-            this.textBoxLog.Size = new System.Drawing.Size(1012, 124);
+            this.textBoxLog.Size = new System.Drawing.Size(1012, 130);
             this.textBoxLog.TabIndex = 6;
             // 
             // Form
@@ -245,7 +245,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1036, 634);
+            this.ClientSize = new System.Drawing.Size(1036, 644);
             this.Controls.Add(this.textBoxLog);
             this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.listViewResults);
