@@ -11,6 +11,7 @@ using System.IO;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using Google.Cloud.Speech.V1Beta1;
+using DiffMatchPatch;
 
 namespace VoiceRecognition
 {
@@ -215,6 +216,18 @@ namespace VoiceRecognition
                 reader.Read();
 
                 // 비교
+
+                var diff = new diff_match_patch();
+                var results = diff.diff_main(voice, reader["script"].ToString());
+                foreach (var verbs in results)
+                {
+                    if(verbs.operation == Operation.DELETE && verbs.operation == Operation.INSERT)
+                    {
+                        //글자수 세기. DELETE만 세야하나?
+                    }
+                }
+                //reader["script"]의 글자수 세기
+                //'원본에서 달라진 정도'를 비교해야한다.
 
                 WriteLog("Voice  : " + voice);
                 WriteLog("Script : " + reader["script"]);

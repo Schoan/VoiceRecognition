@@ -113,6 +113,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiffMatchPatch.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>
