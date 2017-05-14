@@ -216,15 +216,18 @@ namespace VoiceRecognition
                 reader.Read();
 
                 // 비교
-
+                int del_count = 0;
+                int all_count = 0;
                 var diff = new diff_match_patch();
                 var results = diff.diff_main(voice, reader["script"].ToString());
                 foreach (var verbs in results)
                 {
-                    if(verbs.operation == Operation.DELETE && verbs.operation == Operation.INSERT)
+                    if(verbs.operation == Operation.DELETE)
                     {
-                        //글자수 세기. DELETE만 세야하나?
+                        //글자수 세기. 일단은 DELETE만
+                        del_count += verbs.ToString().Length;
                     }
+                    all_count += verbs.ToString().Length;
                 }
                 //reader["script"]의 글자수 세기
                 //'원본에서 달라진 정도'를 비교해야한다.
