@@ -28,10 +28,23 @@ namespace VoiceRecognition
         public Form()
         {
             InitializeComponent();
+            listViewResults.BeginUpdate();
+            ListViewItem lvi = new ListViewItem("1");
+            lvi.SubItems.Add("admin");
+            lvi.SubItems.Add(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            lvi.SubItems.Add("100.00");
+            lvi.SubItems.Add("exercise");
+            lvi.SubItems.Add("Hello, World!");
+            lvi.SubItems.Add("Completed");
+            listViewResults.Items.Add(lvi);
+            listViewResults.EndUpdate();
         }
 
         private void Form_Load(object sender, EventArgs e)
         {
+            // MYSQL 깔려있는지 체크. 없으면 박스 띄우고 이동 URL 제공
+            // 이중 실행 체크. 이미 실행되고 있으면 박스 띄우고 트레이 하이라이트 하거나 활성화
+
             comboBoxPoint.SelectedIndex = 0;
             try
             {
@@ -52,7 +65,6 @@ namespace VoiceRecognition
             if(reader["FLAG"].ToString() != "1")
             {
                 reader.Close();
-                //MessageBox.Show("!");
 
                 cmd = new MySqlCommand("CREATE TABLE scores (" +
                     "number INT(10) AUTO_INCREMENT PRIMARY KEY," +
@@ -135,32 +147,28 @@ namespace VoiceRecognition
         private void videoAdded(String fileName)
         {
             /*
-             * 
              * System init :: 전체 검사
              * 디렉토리 내부 변경 신호; catch : SQL 등록; 번호, 파일명, (점수), 처리날짜, 상태 (extracting voice)
              * 구글에 전달 : SQL 반영 (readout in google)
              * 비교 완료 : SQL 반영; 점수등록 (process complete)
              * 파일 이동 (video -> processed)
              * 
-            */
-
-            //Log 반영코드 추가할것
-
-            /*
              * 들어올 파일의 이름은 '유저이름_스크립트_해시' 형태로 이루어져야 한다.
              * 파일의 이름은 전송하는 클라이언트 수준에서 변경되어 전송되어야 한다.
              * 즉, 해싱 또한 클라이언트에서 수행하여 서버로 전달하며 별도의 검사를 수행하지 않는다.
              * 해시는 파일 무결성을 보장함과 동시에 중복되지 않도록 하는 역할을 수행하도록 한다.
              * SHA256에 의하여 해싱한다. 해시 충돌은 없다고 가정한다.
+             *
              */
 
             String inputVideo = fileName;
             String[] videoName = inputVideo.Split('.');
             String[] param = videoName[0].Split('_');
-            String hash = param[2];
             //LAST_INSERT_ID()로 해당 row의 auto_increment를 알아내는 방법도 있으나 이후 병렬시행될 경우를 고려
+            String hash = param[2];
 
-            //해시기반으로 수정. 해시 중복 체크 후 INSERT
+            WriteLog("fileName : File Detected!");
+            
             cmd = new MySqlCommand("SELECT EXISTS (SELECT * FROM scores WHERE hash = @hash) AS FLAG", sqlConnection);
             cmd.Parameters.AddWithValue("@hash", param[2]);
             reader = cmd.ExecuteReader();
@@ -174,7 +182,7 @@ namespace VoiceRecognition
                 cmd.Parameters.AddWithValue("@user", param[0]);
                 cmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")); //.fff
                 cmd.Parameters.AddWithValue("@script_name", param[1]);
-                cmd.Parameters.AddWithValue("@state", "Processing");
+                cmd.Parameters.AddWithValue("@state", "Converting");
                 cmd.Parameters.AddWithValue("@hash", param[2]);
                 cmd.ExecuteNonQuery();
 
@@ -184,6 +192,7 @@ namespace VoiceRecognition
                 psInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 psInfo.CreateNoWindow = true;
                 Process.Start(psInfo).WaitForExit();
+                WriteLog("fileName : File Converted. Queuing Google Speech API Server.");
 
                 var speech = SpeechClient.Create();
                 var response = speech.SyncRecognize(new RecognitionConfig()
@@ -205,7 +214,7 @@ namespace VoiceRecognition
                 voice = voice.Substring(0, voice.LastIndexOf(","));
 
                 cmd = new MySqlCommand("UPDATE scores SET state=@state, script=@script WHERE hash = @hash", sqlConnection);
-                cmd.Parameters.AddWithValue("@state", "");
+                cmd.Parameters.AddWithValue("@state", "Processing");
                 cmd.Parameters.AddWithValue("@script", voice);
                 cmd.Parameters.AddWithValue("@hash", hash);
                 cmd.ExecuteNonQuery();
@@ -215,7 +224,8 @@ namespace VoiceRecognition
                 reader = cmd.ExecuteReader();
                 reader.Read();
 
-                // 비교
+                WriteLog("fileName : Script Converted. Calcuating score.");
+
                 int del_count = 0;
                 int all_count = 0;
                 var diff = new diff_match_patch();
@@ -224,25 +234,36 @@ namespace VoiceRecognition
                 {
                     if(verbs.operation == Operation.DELETE)
                     {
-                        //글자수 세기. 일단은 DELETE만
                         del_count += verbs.ToString().Length;
                     }
+
                     all_count += verbs.ToString().Length;
                 }
-                //reader["script"]의 글자수 세기
-                //'원본에서 달라진 정도'를 비교해야한다.
 
-                WriteLog("Voice  : " + voice);
-                WriteLog("Script : " + reader["script"]);
+                float score = (float)(all_count - del_count) / all_count * 100;
+
                 reader.Close();
-                
-                // 문장부호 전부 제거할것!!!
+
+                cmd = new MySqlCommand("UPDATE scores SET state=@state, score=@score WHERE hash = @hash", sqlConnection);
+                cmd.Parameters.AddWithValue("@state", "Completed");
+                cmd.Parameters.AddWithValue("@score", score);
+                cmd.Parameters.AddWithValue("@hash", hash);
+                cmd.ExecuteNonQuery();
+
+                WriteLog("fileName : Process Completed.");
+
             }
             else
             {
-                reader.Close();
                 // hash 충돌 처리. 절대다수의 경우 동일파일.
+                reader.Close();
+                WriteLog("fileName : Hash Collision!");
             }
+
+            FileInfo fi = new FileInfo(fileName);
+
+            fi.CopyTo(processedDirectory + fileName, true);
+            fi.Delete();
             
         }
 

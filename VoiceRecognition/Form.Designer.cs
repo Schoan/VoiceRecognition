@@ -49,6 +49,13 @@
             this.buttonExit = new System.Windows.Forms.Button();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.textBoxLog = new System.Windows.Forms.TextBox();
+            this.ch_number = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_user = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_date = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_score = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_script_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_state = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_script = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
@@ -198,6 +205,14 @@
             // 
             // listViewResults
             // 
+            this.listViewResults.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ch_number,
+            this.ch_user,
+            this.ch_date,
+            this.ch_score,
+            this.ch_script_name,
+            this.ch_script,
+            this.ch_state});
             this.listViewResults.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listViewResults.Location = new System.Drawing.Point(12, 177);
             this.listViewResults.MultiSelect = false;
@@ -205,7 +220,7 @@
             this.listViewResults.Size = new System.Drawing.Size(1012, 302);
             this.listViewResults.TabIndex = 4;
             this.listViewResults.UseCompatibleStateImageBehavior = false;
-            this.listViewResults.View = System.Windows.Forms.View.List;
+            this.listViewResults.View = System.Windows.Forms.View.Details;
             // 
             // videofsWatcher
             // 
@@ -239,6 +254,42 @@
             this.textBoxLog.ReadOnly = true;
             this.textBoxLog.Size = new System.Drawing.Size(1012, 130);
             this.textBoxLog.TabIndex = 6;
+            // 
+            // ch_number
+            // 
+            this.ch_number.Text = "#";
+            this.ch_number.Width = 30;
+            // 
+            // ch_user
+            // 
+            this.ch_user.Text = "id";
+            this.ch_user.Width = 80;
+            // 
+            // ch_date
+            // 
+            this.ch_date.Text = "날짜";
+            this.ch_date.Width = 120;
+            // 
+            // ch_score
+            // 
+            this.ch_score.Text = "점수";
+            this.ch_score.Width = 80;
+            // 
+            // ch_script_name
+            // 
+            this.ch_script_name.Text = "대본";
+            this.ch_script_name.Width = 80;
+            // 
+            // ch_state
+            // 
+            this.ch_state.DisplayIndex = 1;
+            this.ch_state.Text = "상태";
+            this.ch_state.Width = 80;
+            // 
+            // ch_script
+            // 
+            this.ch_script.Text = "발화문";
+            this.ch_script.Width = 400;
             // 
             // Form
             // 
@@ -288,6 +339,13 @@
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.TextBox textBoxLog;
+        private System.Windows.Forms.ColumnHeader ch_number;
+        private System.Windows.Forms.ColumnHeader ch_user;
+        private System.Windows.Forms.ColumnHeader ch_date;
+        private System.Windows.Forms.ColumnHeader ch_score;
+        private System.Windows.Forms.ColumnHeader ch_script_name;
+        private System.Windows.Forms.ColumnHeader ch_script;
+        private System.Windows.Forms.ColumnHeader ch_state;
     }
 }
 
