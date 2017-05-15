@@ -56,6 +56,7 @@
             this.ch_script_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_state = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_script = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_hash = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
@@ -212,7 +213,8 @@
             this.ch_score,
             this.ch_script_name,
             this.ch_script,
-            this.ch_state});
+            this.ch_state,
+            this.ch_hash});
             this.listViewResults.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listViewResults.Location = new System.Drawing.Point(12, 177);
             this.listViewResults.MultiSelect = false;
@@ -262,21 +264,25 @@
             // 
             // ch_user
             // 
+            this.ch_user.DisplayIndex = 2;
             this.ch_user.Text = "id";
             this.ch_user.Width = 80;
             // 
             // ch_date
             // 
+            this.ch_date.DisplayIndex = 3;
             this.ch_date.Text = "날짜";
             this.ch_date.Width = 120;
             // 
             // ch_score
             // 
+            this.ch_score.DisplayIndex = 4;
             this.ch_score.Text = "점수";
             this.ch_score.Width = 80;
             // 
             // ch_script_name
             // 
+            this.ch_script_name.DisplayIndex = 5;
             this.ch_script_name.Text = "대본";
             this.ch_script_name.Width = 80;
             // 
@@ -288,8 +294,14 @@
             // 
             // ch_script
             // 
+            this.ch_script.DisplayIndex = 6;
             this.ch_script.Text = "발화문";
             this.ch_script.Width = 400;
+            // 
+            // ch_hash
+            // 
+            this.ch_hash.Text = "Hash";
+            this.ch_hash.Width = 1;
             // 
             // Form
             // 
@@ -346,6 +358,7 @@
         private System.Windows.Forms.ColumnHeader ch_script_name;
         private System.Windows.Forms.ColumnHeader ch_script;
         private System.Windows.Forms.ColumnHeader ch_state;
+        private System.Windows.Forms.ColumnHeader ch_hash;
     }
 }
 
