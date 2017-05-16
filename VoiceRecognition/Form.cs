@@ -25,19 +25,16 @@ namespace VoiceRecognition
         static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio\\";
         static String processedDirectory = Directory.GetCurrentDirectory() + "\\processed\\";
 
+        bool bSearch = false;
+        bool bDate = false;
+        String search_ID;
+        String search_Date;
+        String search_Score;
+        String search_Script;
+
         public Form()
         {
             InitializeComponent();
-            listViewResults.BeginUpdate();
-            ListViewItem lvi = new ListViewItem("1");
-            lvi.SubItems.Add("admin");
-            lvi.SubItems.Add(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            lvi.SubItems.Add("100.00");
-            lvi.SubItems.Add("exercise");
-            lvi.SubItems.Add("Hello, World!");
-            lvi.SubItems.Add("Completed");
-            listViewResults.Items.Add(lvi);
-            listViewResults.EndUpdate();
         }
 
         private void Form_Load(object sender, EventArgs e)
@@ -46,6 +43,8 @@ namespace VoiceRecognition
             // 이중 실행 체크. 이미 실행되고 있으면 박스 띄우고 트레이 하이라이트 하거나 활성화
 
             comboBoxPoint.SelectedIndex = 0;
+            comboBoxScript.SelectedIndex = 0;
+
             try
             {
                 sqlConnection.Open();
@@ -293,6 +292,82 @@ namespace VoiceRecognition
         {
             this.Show();
             this.WindowState = FormWindowState.Normal;
+        }
+
+        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while(true)
+            {
+                listViewResults.BeginUpdate();
+                if(bSearch)
+                {
+
+                }
+                else
+                {
+                    cmd = new MySqlCommand("SELECT * FROM scores DESC", sqlConnection);
+                    reader = cmd.ExecuteReader();
+                    while(reader.Read())
+                    {
+                        ListViewItem lvi = new ListViewItem(reader["user"].ToString());
+                        lvi.SubItems.Add(reader["date"].ToString());
+                        lvi.SubItems.Add(reader["score"].ToString());
+                        lvi.SubItems.Add(reader["script_name"].ToString());
+                        lvi.SubItems.Add(reader["script"].ToString());
+                        lvi.SubItems.Add(reader["state"].ToString());
+                        listViewResults.Items.Add(lvi);
+                    }
+                }
+                listViewResults.EndUpdate();
+
+                listViewResults.Items.Clear();
+
+            }
+        }
+
+        private void buttonSearch_Click(object sender, EventArgs e)
+        {
+            bSearch = true;
+
+            if (textBoxName.Text.Trim() != "")
+                search_ID = textBoxName.Text.ToString();
+
+            if (bDate)
+                search_Date = dateTimePicker.Value.ToString("yyyy-MM-dd");
+
+            if (textBoxScore.Text.Trim() != "")
+                search_Score = textBoxScore.Text.ToString();
+
+            if (comboBoxScript.SelectedIndex != 0)
+                search_Script = comboBoxScript.SelectedText;
+
+        }
+
+        private void dateTimePicker_DropDown(object sender, EventArgs e)
+        {
+            if(!bDate)
+            {
+                bDate = true;
+
+                dateTimePicker.Format = DateTimePickerFormat.Short;
+                dateTimePicker.Value = DateTime.Now;
+            }
+        }
+
+        private void buttonFullList_Click(object sender, EventArgs e)
+        {
+            //Form Initialize
+
+            bSearch = false;
+            bDate = false;
+
+            textBoxName.Text = "";
+            textBoxScore.Text = "";
+
+            dateTimePicker.Format = DateTimePickerFormat.Custom;
+            dateTimePicker.CustomFormat = " ";
+
+            comboBoxScript.SelectedIndex = 0;
         }
     }
 }

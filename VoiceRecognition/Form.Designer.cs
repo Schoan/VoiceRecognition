@@ -39,7 +39,7 @@
             this.buttonSearch = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.comboBoxPoint = new System.Windows.Forms.ComboBox();
-            this.textBoxPoint = new System.Windows.Forms.TextBox();
+            this.textBoxScore = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label2 = new System.Windows.Forms.Label();
@@ -49,14 +49,13 @@
             this.buttonExit = new System.Windows.Forms.Button();
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.textBoxLog = new System.Windows.Forms.TextBox();
-            this.ch_number = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_user = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_date = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_score = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_script_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_state = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_script = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ch_hash = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
             this.SuspendLayout();
@@ -70,6 +69,7 @@
             this.buttonFullList.Size = new System.Drawing.Size(55, 55);
             this.buttonFullList.TabIndex = 0;
             this.buttonFullList.UseVisualStyleBackColor = true;
+            this.buttonFullList.Click += new System.EventHandler(this.buttonFullList_Click);
             // 
             // imageList
             // 
@@ -93,11 +93,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(20, 33);
+            this.label1.Location = new System.Drawing.Point(28, 33);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 20);
+            this.label1.Size = new System.Drawing.Size(38, 20);
             this.label1.TabIndex = 2;
-            this.label1.Text = "이름 : ";
+            this.label1.Text = "ID : ";
             // 
             // groupBox
             // 
@@ -105,7 +105,7 @@
             this.groupBox.Controls.Add(this.buttonSearch);
             this.groupBox.Controls.Add(this.label4);
             this.groupBox.Controls.Add(this.comboBoxPoint);
-            this.groupBox.Controls.Add(this.textBoxPoint);
+            this.groupBox.Controls.Add(this.textBoxScore);
             this.groupBox.Controls.Add(this.label3);
             this.groupBox.Controls.Add(this.dateTimePicker);
             this.groupBox.Controls.Add(this.label2);
@@ -122,6 +122,8 @@
             // 
             this.comboBoxScript.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxScript.FormattingEnabled = true;
+            this.comboBoxScript.Items.AddRange(new object[] {
+            "(전체 검색)"});
             this.comboBoxScript.Location = new System.Drawing.Point(696, 29);
             this.comboBoxScript.Name = "comboBoxScript";
             this.comboBoxScript.Size = new System.Drawing.Size(219, 28);
@@ -136,6 +138,7 @@
             this.buttonSearch.Size = new System.Drawing.Size(55, 55);
             this.buttonSearch.TabIndex = 1;
             this.buttonSearch.UseVisualStyleBackColor = true;
+            this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
             // 
             // label4
             // 
@@ -148,6 +151,7 @@
             // 
             // comboBoxPoint
             // 
+            this.comboBoxPoint.BackColor = System.Drawing.SystemColors.Window;
             this.comboBoxPoint.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxPoint.DropDownWidth = 44;
             this.comboBoxPoint.FormattingEnabled = true;
@@ -160,12 +164,12 @@
             this.comboBoxPoint.Size = new System.Drawing.Size(72, 28);
             this.comboBoxPoint.TabIndex = 8;
             // 
-            // textBoxPoint
+            // textBoxScore
             // 
-            this.textBoxPoint.Location = new System.Drawing.Point(491, 31);
-            this.textBoxPoint.Name = "textBoxPoint";
-            this.textBoxPoint.Size = new System.Drawing.Size(52, 26);
-            this.textBoxPoint.TabIndex = 7;
+            this.textBoxScore.Location = new System.Drawing.Point(491, 31);
+            this.textBoxScore.Name = "textBoxScore";
+            this.textBoxScore.Size = new System.Drawing.Size(52, 26);
+            this.textBoxScore.TabIndex = 7;
             // 
             // label3
             // 
@@ -178,15 +182,16 @@
             // 
             // dateTimePicker
             // 
-            this.dateTimePicker.CustomFormat = "";
-            this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dateTimePicker.CustomFormat = " ";
+            this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateTimePicker.Location = new System.Drawing.Point(289, 30);
             this.dateTimePicker.MaxDate = new System.DateTime(2039, 12, 31, 0, 0, 0, 0);
             this.dateTimePicker.MinDate = new System.DateTime(2017, 1, 1, 0, 0, 0, 0);
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(125, 26);
             this.dateTimePicker.TabIndex = 5;
-            this.dateTimePicker.Value = new System.DateTime(2017, 4, 15, 0, 0, 0, 0);
+            this.dateTimePicker.Value = new System.DateTime(2017, 1, 1, 0, 0, 0, 0);
+            this.dateTimePicker.DropDown += new System.EventHandler(this.dateTimePicker_DropDown);
             // 
             // label2
             // 
@@ -207,14 +212,12 @@
             // listViewResults
             // 
             this.listViewResults.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ch_number,
             this.ch_user,
             this.ch_date,
             this.ch_score,
             this.ch_script_name,
             this.ch_script,
-            this.ch_state,
-            this.ch_hash});
+            this.ch_state});
             this.listViewResults.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listViewResults.Location = new System.Drawing.Point(12, 177);
             this.listViewResults.MultiSelect = false;
@@ -257,51 +260,45 @@
             this.textBoxLog.Size = new System.Drawing.Size(1012, 130);
             this.textBoxLog.TabIndex = 6;
             // 
-            // ch_number
-            // 
-            this.ch_number.Text = "#";
-            this.ch_number.Width = 30;
-            // 
             // ch_user
             // 
-            this.ch_user.DisplayIndex = 2;
+            this.ch_user.DisplayIndex = 1;
             this.ch_user.Text = "id";
             this.ch_user.Width = 80;
             // 
             // ch_date
             // 
-            this.ch_date.DisplayIndex = 3;
+            this.ch_date.DisplayIndex = 2;
             this.ch_date.Text = "날짜";
             this.ch_date.Width = 120;
             // 
             // ch_score
             // 
-            this.ch_score.DisplayIndex = 4;
+            this.ch_score.DisplayIndex = 3;
             this.ch_score.Text = "점수";
             this.ch_score.Width = 80;
             // 
             // ch_script_name
             // 
-            this.ch_script_name.DisplayIndex = 5;
+            this.ch_script_name.DisplayIndex = 4;
             this.ch_script_name.Text = "대본";
             this.ch_script_name.Width = 80;
             // 
-            // ch_state
-            // 
-            this.ch_state.DisplayIndex = 1;
-            this.ch_state.Text = "상태";
-            this.ch_state.Width = 80;
-            // 
             // ch_script
             // 
-            this.ch_script.DisplayIndex = 6;
+            this.ch_script.DisplayIndex = 5;
             this.ch_script.Text = "발화문";
             this.ch_script.Width = 400;
             // 
-            // ch_hash
+            // ch_state
             // 
-            this.ch_hash.Text = "Hash";
-            this.ch_hash.Width = 1;
+            this.ch_state.DisplayIndex = 0;
+            this.ch_state.Text = "상태";
+            this.ch_state.Width = 80;
+            // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
             // 
             // Form
             // 
@@ -340,7 +337,7 @@
         private System.Windows.Forms.TextBox textBoxName;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.DateTimePicker dateTimePicker;
-        private System.Windows.Forms.TextBox textBoxPoint;
+        private System.Windows.Forms.TextBox textBoxScore;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboBoxPoint;
         private System.Windows.Forms.ComboBox comboBoxScript;
@@ -351,14 +348,13 @@
         private System.Windows.Forms.Button buttonExit;
         private System.Windows.Forms.NotifyIcon notifyIcon;
         private System.Windows.Forms.TextBox textBoxLog;
-        private System.Windows.Forms.ColumnHeader ch_number;
         private System.Windows.Forms.ColumnHeader ch_user;
         private System.Windows.Forms.ColumnHeader ch_date;
         private System.Windows.Forms.ColumnHeader ch_score;
         private System.Windows.Forms.ColumnHeader ch_script_name;
         private System.Windows.Forms.ColumnHeader ch_script;
         private System.Windows.Forms.ColumnHeader ch_state;
-        private System.Windows.Forms.ColumnHeader ch_hash;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }
 
