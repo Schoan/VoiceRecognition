@@ -18,6 +18,7 @@ namespace VoiceRecognition
     public partial class Form : System.Windows.Forms.Form
     {
         static MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
+        static MySqlConnection back_sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
         static MySqlCommand cmd = new MySqlCommand();
         static MySqlDataReader reader;
 
@@ -25,12 +26,17 @@ namespace VoiceRecognition
         static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio\\";
         static String processedDirectory = Directory.GetCurrentDirectory() + "\\processed\\";
 
-        bool bSearch = false;
-        bool bDate = false;
+        static float stopSecond = 5.0F;
+
+        //0x1 = Search, 0x2 = ID, 0x4 = Date, 0x8 = Score, 0x16 = Script
+        int search_flag = 0;
         String search_ID;
         String search_Date;
         String search_Score;
         String search_Script;
+
+        BackgroundWorker worker;
+
 
         public Form()
         {
@@ -48,6 +54,7 @@ namespace VoiceRecognition
             try
             {
                 sqlConnection.Open();
+                back_sqlConnection.Open();
             }
             catch (Exception ee)
             {
@@ -110,6 +117,11 @@ namespace VoiceRecognition
             }
 
             FolderChecker();
+
+            worker = new BackgroundWorker();
+            worker.DoWork += new DoWorkEventHandler(backgroundWorker_DoWork);
+            worker.RunWorkerAsync();
+            
         }
 
         private void FolderChecker()
@@ -259,7 +271,7 @@ namespace VoiceRecognition
                 WriteLog("fileName : Hash Collision!");
             }
 
-            FileInfo fi = new FileInfo(fileName);
+            FileInfo fi = new FileInfo(videoDirectory + fileName);
 
             fi.CopyTo(processedDirectory + fileName, true);
             fi.Delete();
@@ -296,30 +308,38 @@ namespace VoiceRecognition
 
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            MySqlCommand back_cmd;
+            MySqlDataReader back_reader;
+            
             while(true)
             {
+                CheckForIllegalCrossThreadCalls = false;
                 listViewResults.BeginUpdate();
-                if(bSearch)
+                
+                if(search_flag & 0x1 == 0x1)
                 {
 
                 }
                 else
                 {
-                    cmd = new MySqlCommand("SELECT * FROM scores DESC", sqlConnection);
-                    reader = cmd.ExecuteReader();
-                    while(reader.Read())
+                    
+                    back_cmd = new MySqlCommand("SELECT * FROM scores ORDER BY number DESC", back_sqlConnection);
+                    back_reader = back_cmd.ExecuteReader();
+                    while(back_reader.Read())
                     {
-                        ListViewItem lvi = new ListViewItem(reader["user"].ToString());
-                        lvi.SubItems.Add(reader["date"].ToString());
-                        lvi.SubItems.Add(reader["score"].ToString());
-                        lvi.SubItems.Add(reader["script_name"].ToString());
-                        lvi.SubItems.Add(reader["script"].ToString());
-                        lvi.SubItems.Add(reader["state"].ToString());
+                        ListViewItem lvi = new ListViewItem(back_reader["user"].ToString());
+                        lvi.SubItems.Add(back_reader["date"].ToString());
+                        lvi.SubItems.Add(back_reader["score"].ToString());
+                        lvi.SubItems.Add(back_reader["script_name"].ToString());
+                        lvi.SubItems.Add(back_reader["script"].ToString());
+                        lvi.SubItems.Add(back_reader["state"].ToString());
                         listViewResults.Items.Add(lvi);
                     }
+                    back_reader.Close();
                 }
-                listViewResults.EndUpdate();
 
+                listViewResults.EndUpdate();
+                System.Threading.Thread.Sleep((int)(stopSecond*1000));
                 listViewResults.Items.Clear();
 
             }
@@ -359,7 +379,7 @@ namespace VoiceRecognition
             //Form Initialize
 
             bSearch = false;
-            bDate = false;
+            search_flag = 0;
 
             textBoxName.Text = "";
             textBoxScore.Text = "";
