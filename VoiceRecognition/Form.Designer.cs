@@ -32,7 +32,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form));
             this.buttonFullList = new System.Windows.Forms.Button();
             this.imageList = new System.Windows.Forms.ImageList(this.components);
-            this.buttonOption = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox = new System.Windows.Forms.GroupBox();
             this.comboBoxScript = new System.Windows.Forms.ComboBox();
@@ -45,16 +44,16 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxName = new System.Windows.Forms.TextBox();
             this.listViewResults = new System.Windows.Forms.ListView();
-            this.videofsWatcher = new System.IO.FileSystemWatcher();
-            this.buttonExit = new System.Windows.Forms.Button();
-            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.textBoxLog = new System.Windows.Forms.TextBox();
             this.ch_user = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_date = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_score = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_script_name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ch_state = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ch_script = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.ch_state = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.videofsWatcher = new System.IO.FileSystemWatcher();
+            this.buttonExit = new System.Windows.Forms.Button();
+            this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.textBoxLog = new System.Windows.Forms.TextBox();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.groupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.videofsWatcher)).BeginInit();
@@ -79,16 +78,6 @@
             this.imageList.Images.SetKeyName(1, "icon_option.png");
             this.imageList.Images.SetKeyName(2, "icon_search.png");
             this.imageList.Images.SetKeyName(3, "icon_exit.png");
-            // 
-            // buttonOption
-            // 
-            this.buttonOption.ImageIndex = 1;
-            this.buttonOption.ImageList = this.imageList;
-            this.buttonOption.Location = new System.Drawing.Point(73, 12);
-            this.buttonOption.Name = "buttonOption";
-            this.buttonOption.Size = new System.Drawing.Size(55, 55);
-            this.buttonOption.TabIndex = 1;
-            this.buttonOption.UseVisualStyleBackColor = true;
             // 
             // label1
             // 
@@ -227,39 +216,6 @@
             this.listViewResults.UseCompatibleStateImageBehavior = false;
             this.listViewResults.View = System.Windows.Forms.View.Details;
             // 
-            // videofsWatcher
-            // 
-            this.videofsWatcher.EnableRaisingEvents = true;
-            this.videofsWatcher.SynchronizingObject = this;
-            // 
-            // buttonExit
-            // 
-            this.buttonExit.ImageIndex = 3;
-            this.buttonExit.ImageList = this.imageList;
-            this.buttonExit.Location = new System.Drawing.Point(134, 12);
-            this.buttonExit.Name = "buttonExit";
-            this.buttonExit.Size = new System.Drawing.Size(55, 55);
-            this.buttonExit.TabIndex = 5;
-            this.buttonExit.UseVisualStyleBackColor = true;
-            this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
-            // 
-            // notifyIcon
-            // 
-            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
-            this.notifyIcon.Text = "승승";
-            this.notifyIcon.Visible = true;
-            this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
-            // 
-            // textBoxLog
-            // 
-            this.textBoxLog.BackColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.textBoxLog.Location = new System.Drawing.Point(12, 498);
-            this.textBoxLog.Multiline = true;
-            this.textBoxLog.Name = "textBoxLog";
-            this.textBoxLog.ReadOnly = true;
-            this.textBoxLog.Size = new System.Drawing.Size(1012, 130);
-            this.textBoxLog.TabIndex = 6;
-            // 
             // ch_user
             // 
             this.ch_user.DisplayIndex = 1;
@@ -296,6 +252,39 @@
             this.ch_state.Text = "상태";
             this.ch_state.Width = 80;
             // 
+            // videofsWatcher
+            // 
+            this.videofsWatcher.EnableRaisingEvents = true;
+            this.videofsWatcher.SynchronizingObject = this;
+            // 
+            // buttonExit
+            // 
+            this.buttonExit.ImageIndex = 3;
+            this.buttonExit.ImageList = this.imageList;
+            this.buttonExit.Location = new System.Drawing.Point(73, 12);
+            this.buttonExit.Name = "buttonExit";
+            this.buttonExit.Size = new System.Drawing.Size(55, 55);
+            this.buttonExit.TabIndex = 5;
+            this.buttonExit.UseVisualStyleBackColor = true;
+            this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
+            // 
+            // notifyIcon
+            // 
+            this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
+            this.notifyIcon.Text = "승승";
+            this.notifyIcon.Visible = true;
+            this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
+            // 
+            // textBoxLog
+            // 
+            this.textBoxLog.BackColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.textBoxLog.Location = new System.Drawing.Point(12, 498);
+            this.textBoxLog.Multiline = true;
+            this.textBoxLog.Name = "textBoxLog";
+            this.textBoxLog.ReadOnly = true;
+            this.textBoxLog.Size = new System.Drawing.Size(1012, 130);
+            this.textBoxLog.TabIndex = 6;
+            // 
             // backgroundWorker
             // 
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
@@ -310,7 +299,6 @@
             this.Controls.Add(this.buttonExit);
             this.Controls.Add(this.listViewResults);
             this.Controls.Add(this.groupBox);
-            this.Controls.Add(this.buttonOption);
             this.Controls.Add(this.buttonFullList);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -330,7 +318,6 @@
         #endregion
 
         private System.Windows.Forms.Button buttonFullList;
-        private System.Windows.Forms.Button buttonOption;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ImageList imageList;
         private System.Windows.Forms.GroupBox groupBox;

@@ -13,18 +13,6 @@ using MySql.Data.MySqlClient;
 using Google.Cloud.Speech.V1Beta1;
 using DiffMatchPatch;
 
-[Flags]
-public enum Search
-{
-    None = 0x0,
-    ID = 0x1,
-    Date = 0x2,
-    Score = 0x4,
-    Script = 0x8,
-    Search = 0x10,
-    All = int.MaxValue
-};
-
 namespace VoiceRecognition
 {
     public partial class Form : System.Windows.Forms.Form
@@ -38,15 +26,12 @@ namespace VoiceRecognition
         static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio\\";
         static String processedDirectory = Directory.GetCurrentDirectory() + "\\processed\\";
 
-        static float stopSecond = 5.0F;
+        static float stopSecond = 2.0F;
 
-        Search search_flag = 0;
-        String search_ID;
-        String search_Date;
-        String search_Score;
-        String search_Script;
+        bool bSearch = false;
+        bool bDate = false;
 
-        String search_cmd = "SELECT * FROM scores WHERE";
+        String search_cmd = "SELECT * FROM scores WHERE ";
 
         BackgroundWorker worker;
 
@@ -58,7 +43,6 @@ namespace VoiceRecognition
 
         private void Form_Load(object sender, EventArgs e)
         {
-            // MYSQL 깔려있는지 체크. 없으면 박스 띄우고 이동 URL 제공
             // 이중 실행 체크. 이미 실행되고 있으면 박스 띄우고 트레이 하이라이트 하거나 활성화
 
             comboBoxPoint.SelectedIndex = 0;
@@ -128,6 +112,14 @@ namespace VoiceRecognition
                 }
                 reader.Close();
             }
+
+            cmd = new MySqlCommand("SELECT script_name FROM scripts", sqlConnection);
+            reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                comboBoxScript.Items.Add(reader["script_name"]);
+            }
+            reader.Close();
 
             FolderChecker();
 
@@ -328,41 +320,24 @@ namespace VoiceRecognition
             {
                 CheckForIllegalCrossThreadCalls = false;
                 listViewResults.BeginUpdate();
-                
-                // back_cmd만 빼고 전부 동일. if문 바깥으로 옮길 것.
-                if((search_flag & Search.Search )!= 0)
-                {
-                    back_cmd = new MySqlCommand(search_cmd, back_sqlConnection);
-                    back_reader = back_cmd.ExecuteReader();
-                    while (back_reader.Read())
-                    {
-                        ListViewItem lvi = new ListViewItem(back_reader["user"].ToString());
-                        lvi.SubItems.Add(back_reader["date"].ToString());
-                        lvi.SubItems.Add(back_reader["score"].ToString());
-                        lvi.SubItems.Add(back_reader["script_name"].ToString());
-                        lvi.SubItems.Add(back_reader["script"].ToString());
-                        lvi.SubItems.Add(back_reader["state"].ToString());
-                        listViewResults.Items.Add(lvi);
-                    }
-                    back_reader.Close();
 
-                }
+                if (bSearch)
+                    back_cmd = new MySqlCommand(search_cmd + "ORDER BY number DESC", back_sqlConnection);
                 else
-                {
                     back_cmd = new MySqlCommand("SELECT * FROM scores ORDER BY number DESC", back_sqlConnection);
-                    back_reader = back_cmd.ExecuteReader();
-                    while(back_reader.Read())
-                    {
-                        ListViewItem lvi = new ListViewItem(back_reader["user"].ToString());
-                        lvi.SubItems.Add(back_reader["date"].ToString());
-                        lvi.SubItems.Add(back_reader["score"].ToString());
-                        lvi.SubItems.Add(back_reader["script_name"].ToString());
-                        lvi.SubItems.Add(back_reader["script"].ToString());
-                        lvi.SubItems.Add(back_reader["state"].ToString());
-                        listViewResults.Items.Add(lvi);
-                    }
-                    back_reader.Close();
+
+                back_reader = back_cmd.ExecuteReader();
+                while(back_reader.Read())
+                {
+                    ListViewItem lvi = new ListViewItem(back_reader["user"].ToString());
+                    lvi.SubItems.Add(back_reader["date"].ToString());
+                    lvi.SubItems.Add(back_reader["score"].ToString());
+                    lvi.SubItems.Add(back_reader["script_name"].ToString());
+                    lvi.SubItems.Add(back_reader["script"].ToString());
+                    lvi.SubItems.Add(back_reader["state"].ToString());
+                    listViewResults.Items.Add(lvi);
                 }
+                back_reader.Close();
 
                 listViewResults.EndUpdate();
                 System.Threading.Thread.Sleep((int)(stopSecond*1000));
@@ -373,51 +348,27 @@ namespace VoiceRecognition
 
         private void buttonSearch_Click(object sender, EventArgs e)
         {
-            if (textBoxName.Text.Trim() != "")
-            {
-                search_flag ^= Search.ID;
-                search_ID = textBoxName.Text.ToString();
-            }
+            bSearch = true;
+            search_cmd = "SELECT * FROM scores WHERE ";
 
-            if ((search_flag & Search.Date) != 0)
-                search_Date = dateTimePicker.Value.ToString("yyyy-MM-dd");
+            if (textBoxName.Text.Trim() != "")
+                search_cmd += "user = '" + textBoxName.Text.ToString() + "' AND ";
+
+            if (bDate)
+                search_cmd += "date(date) = '" + dateTimePicker.Value.ToString("yyyy-MM-dd") + "' AND ";
 
             if (textBoxScore.Text.Trim() != "")
             {
-                search_flag ^= Search.Score;
-
                 if (comboBoxPoint.SelectedIndex == 0)
-                    search_Score = ">= " + textBoxScore.Text.ToString();
+                    search_cmd += "score >= " + textBoxScore.Text.ToString() + " AND ";
                 else
-                    search_Score = "<= " + textBoxScore.Text.ToString();
+                    search_cmd += "score <= " + textBoxScore.Text.ToString() + " AND ";
             }
 
             if (comboBoxScript.SelectedIndex != 0)
-            {
-                search_flag ^= Search.Script;
-                search_Script = comboBoxScript.SelectedText;
-            }
-
-            // 플래그도, 임시저장 변수도 지워도 됨! bool형... search flag, date flag만 남기고!
-            if (search_flag.HasFlag(Search.ID))
-            {
-                search_cmd += "user = '" + search_ID + "' AND ";
-            }
-
-            if (search_flag.HasFlag(Search.Date))
-            {
-                search_cmd += "date(date) = '" + search_Date + "' AND ";
-            }
-
-            if (search_flag.HasFlag(Search.Score))
-            {
-                search_cmd += "score " + search_Score + " AND ";
-            }
-
-            if (search_flag.HasFlag(Search.Script))
-            {
-                search_cmd += "script_name = '" + search_Script + " AND ";
-            }
+                search_cmd += "script_name = '" + comboBoxScript.SelectedItem.ToString() + "' AND ";
+            else
+                search_cmd += "1=1 AND ";
 
             search_cmd = search_cmd.Substring(0, search_cmd.LastIndexOf("AND "));
 
@@ -425,9 +376,9 @@ namespace VoiceRecognition
 
         private void dateTimePicker_DropDown(object sender, EventArgs e)
         {
-            if((search_flag & Search.Date) == 0)
+            if(!bDate)
             {
-                search_flag ^= Search.Date;
+                bDate = true;
 
                 dateTimePicker.Format = DateTimePickerFormat.Short;
                 dateTimePicker.Value = DateTime.Now;
@@ -437,10 +388,8 @@ namespace VoiceRecognition
         private void buttonFullList_Click(object sender, EventArgs e)
         {
             //Form Initialize
-
-            search_cmd = "SELECT * FROM scores WHERE";
-
-            search_flag = Search.None;
+            bSearch = false;
+            bDate = false;
 
             textBoxName.Text = "";
             textBoxScore.Text = "";
