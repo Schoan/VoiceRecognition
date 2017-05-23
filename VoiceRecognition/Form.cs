@@ -17,6 +17,7 @@ namespace VoiceRecognition
 {
     public partial class Form : System.Windows.Forms.Form
     {
+        //Secure Connection! using SSL
         static MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
         static MySqlConnection back_sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
         static MySqlCommand cmd = new MySqlCommand();
