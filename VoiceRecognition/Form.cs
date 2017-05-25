@@ -17,17 +17,16 @@ namespace VoiceRecognition
 {
     public partial class Form : System.Windows.Forms.Form
     {
-        //Secure Connection! using SSL
-        static MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
-        static MySqlConnection back_sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung;");
-        static MySqlCommand cmd = new MySqlCommand();
-        static MySqlDataReader reader;
+        //Secure Connection using SSL
+        MySqlConnection sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung; SslMode=Required;");
+        MySqlConnection back_sqlConnection = new MySqlConnection("server=127.0.0.1; uid=root; pwd=rlgus5125; database=seungseung; SslMode=Required;");
+        MySqlCommand cmd = new MySqlCommand();
+        MySqlDataReader reader;
 
-        static String videoDirectory = Directory.GetCurrentDirectory() + "\\video\\";
-        static String audioDirectory = Directory.GetCurrentDirectory() + "\\audio\\";
-        static String processedDirectory = Directory.GetCurrentDirectory() + "\\processed\\";
-
-        static float stopSecond = 2.0F;
+        String videoDirectory = Directory.GetCurrentDirectory() + "\\video\\";
+        String audioDirectory = Directory.GetCurrentDirectory() + "\\audio\\";
+        String processedDirectory = Directory.GetCurrentDirectory() + "\\processed\\";
+        float stopSecond = 2.0F;
 
         bool bSearch = false;
         bool bDate = false;
@@ -145,14 +144,14 @@ namespace VoiceRecognition
             videofsWatcher.NotifyFilter = NotifyFilters.FileName;
             videofsWatcher.Filter = "";
 
-            videofsWatcher.Created += new FileSystemEventHandler(videoCreated);
-
-            /*
-             * 원래 폴더안에 들어있던 파일에 대해 시행
+            //원래 폴더에 들어있던 파일에 대해 시행
             foreach (var item in dInfo.GetFiles())
             {
                 videoAdded(item.Name);
-            }*/
+            }
+
+            videofsWatcher.Created += new FileSystemEventHandler(videoCreated);
+
         }
 
         
